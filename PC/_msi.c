@@ -723,7 +723,11 @@ view_fetch(msiobj *view, PyObject*args)
     int status;
     MSIHANDLE result;
 
-    if ((status = MsiViewFetch(view->h, &result)) != ERROR_SUCCESS)
+    status = MsiViewFetch(view->h, &result);
+    if (status == ERROR_NO_MORE_ITEMS) {
+        Py_INCREF(Py_None);
+        return Py_None;
+    } else if (status != ERROR_SUCCESS)
         return msierror(status);
 
     return record_new(result);
